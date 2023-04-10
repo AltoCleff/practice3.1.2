@@ -1,36 +1,45 @@
 package my.altocleff.practice312.service;
 
-import my.altocleff.practice312.dao.UserDao;
+import my.altocleff.practice312.repository.UserRepository;
+import my.altocleff.practice312.exeption.UserNotFoundException;
 import my.altocleff.practice312.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@Transactional
 public class UserServiceImp implements UserService{
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
 
     @Override
     public void add(User user) {
-        userDao.save(user);
+        userRepository.save(user);
     }
 
     @Override
     public User get(Long id) {
-        return userDao.findById(id).isPresent() ?  userDao.findById(id).get() : new User();
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()){
+            return user.get();
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 
     @Override
     public void delete(Long id) {
-        userDao.deleteById(id);
+        userRepository.deleteById(id);
     }
 
     @Override
     public List<User> getAll() {
-        return userDao.findAll();
+        return userRepository.findAll();
     }
 }

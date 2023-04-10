@@ -1,8 +1,11 @@
 package my.altocleff.practice312.controller;
 
+import my.altocleff.practice312.exeption.UserNotFoundException;
 import my.altocleff.practice312.model.User;
 import my.altocleff.practice312.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -15,7 +18,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping(value = "/")
-    public String giveTestPage (ModelMap model) {
+    public String userInfo (ModelMap model) {
         model.addAttribute("users", userService.getAll());
         model.addAttribute("user", new User());
         return "userinfo";
@@ -48,6 +51,11 @@ public class UserController {
     public String update(@ModelAttribute("user") User user) {
         userService.add(user);
         return "redirect:/";
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleRuntimeException() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
 }
